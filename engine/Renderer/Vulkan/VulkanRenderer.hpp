@@ -32,6 +32,128 @@ namespace wfe {
 		VulkanRenderer& operator=(const VulkanRenderer&) = delete;
 		VulkanRenderer& operator=(VulkanRenderer&&) = delete;
 
+		/// @brief Gets the Vulkan render's window.
+		/// @return A pointer to renderer's window, or nullptr if the renderer is compute only.
+		Window* GetWindow() {
+			return window;
+		}
+		/// @brief Gets the Vulkan render's window.
+		/// @return A const pointer to renderer's window, or nullptr if the renderer is compute only.
+		const Window* GetWindow() const {
+			return window;
+		}
+		/// @brief Gets the Vulkan renderer's logger.
+		/// @return A pointer to the renderer's logger.
+		Logger* GetLogger() {
+			return logger;
+		}
+		/// @brief Gets the Vulkan renderer's logger.
+		/// @return A pointer to the Vulkan renderer's logger.
+		const Logger* GetLogger() const {
+			return logger;
+		}
+
+		/// @brief Gets the Vulkan renderer's loader.
+		/// @return A pointer to the Vulkan renderer's loader.
+		VulkanLoader* GetLoader() {
+			return loader;
+		}
+		/// @brief Gets the Vulkan renderer's loader.
+		/// @return A const pointer to the Vulkan renderer's loader.
+		const VulkanLoader* GetLoader() const {
+			return loader;
+		}
+		/// @brief Gets the Vulkan renderer's instance.
+		/// @return A pointer to the Vulkan renderer's instance.
+		VulkanInstance* GetInstance() {
+			return instance;
+		}
+		/// @brief Gets the Vulkan renderer's instance.
+		/// @return A const pointer to the Vulkan renderer's instance.
+		const VulkanInstance* GetInstance() const {
+			return instance;
+		}
+		/// @brief Gets the Vulkan renderer's surface.
+		/// @return A pointer to the Vulkan renderer's surface.
+		VulkanSurface* GetSurface() {
+			return surface;
+		}
+		/// @brief Gets the Vulkan renderer's surface.
+		/// @return A const pointer to the Vulkan renderer's surface.
+		const VulkanSurface* GetSurface() const {
+			return surface;
+		}
+		/// @brief Gets the Vulkan renderer's device.
+		/// @return A pointer to the Vulkan renderer's device.
+		VulkanDevice* GetDevice() {
+			return device;
+		}
+		/// @brief Gets the Vulkan renderer's device.
+		/// @return A const pointer to the Vulkan renderer's device.
+		const VulkanDevice* GetDevice() const {
+			return device;
+		}
+		/// @brief Gets the Vulkan renderer's graphics command pool.
+		/// @return A pointer to the Vulkan renderer's graphics command pool.
+		VulkanCommandPool* GetGraphicsCommandPool() {
+			return graphicsCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's graphics command pool.
+		/// @return A const pointer to the Vulkan renderer's graphics command pool.
+		const VulkanCommandPool* GetGraphicsCommandPool() const {
+			return graphicsCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's present command pool.
+		/// @return A pointer to the Vulkan renderer's present command pool.
+		VulkanCommandPool* GetPresentCommandPool() {
+			return presentCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's present command pool.
+		/// @return A const pointer to the Vulkan renderer's present command pool.
+		const VulkanCommandPool* GetPresentCommandPool() const {
+			return presentCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's transfer command pool.
+		/// @return A pointer to the Vulkan renderer's transfer command pool.
+		VulkanCommandPool* GetTransferCommandPool() {
+			return transferCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's transfer command pool.
+		/// @return A const pointer to the Vulkan renderer's transfer command pool.
+		const VulkanCommandPool* GetTransferCommandPool() const {
+			return transferCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's compute command pool.
+		/// @return A pointer to the Vulkan renderer's compute command pool.
+		VulkanCommandPool* GetComputeCommandPool() {
+			return computeCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's compute command pool.
+		/// @return A const pointer to the Vulkan renderer's compute command pool.
+		const VulkanCommandPool* GetComputeCommandPool() const {
+			return computeCommandPool;
+		}
+		/// @brief Gets the Vulkan renderer's allocator.
+		/// @return A pointer to the Vulkan renderer's allocator.
+		VulkanAllocator* GetAllocator() {
+			return allocator;
+		}
+		/// @brief Gets the Vulkan renderer's allocator.
+		/// @return A const pointer to the Vulkan renderer's allocator.
+		const VulkanAllocator* GetAllocator() const {
+			return allocator;
+		}
+		/// @brief Gets the Vulkan renderer's swap chain.
+		/// @return A pointer to the Vulkan renderer's swap chain.
+		VulkanSwapChain* GetSwapChain() {
+			return swapChain;
+		}
+		/// @brief Gets the Vulkan renderer's swap chain.
+		/// @return A const pointer to the Vulkan renderer's swap chain.
+		const VulkanSwapChain* GetSwapChain() const {
+			return swapChain;
+		}
+
 		/// @brief Destroys the Vulkan renderer.
 		~VulkanRenderer();
 	private:

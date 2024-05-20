@@ -17,6 +17,9 @@ namespace wfe {
 		// Create the logger
 		logger = NewObject<Logger>("log.txt", false);
 
+		// Create the job manager
+		jobManager = NewObject<JobManager>();
+
 		// Create the window
 		Window::WindowInfo windowInfo {
 			.name = WFE_PROJECT_NAME,
@@ -31,6 +34,10 @@ namespace wfe {
 
 		// Create the renderer
 		renderer = NewObject<Renderer>(window, true, logger);
+
+		// Create the asset manager and load the main asset dir
+		assetManager = NewObject<AssetManager>("assets/", this);
+		assetManager->LoadAssets("main/");
 
 		// Add the window close event callback
 		window->GetCloseEvent().AddListener(Event::Listener(WindowCloseEventCallback, this));
@@ -58,8 +65,10 @@ namespace wfe {
 		window->GetCloseEvent().RemoveListener(Event::Listener(WindowCloseEventCallback, this));
 
 		// Destroy all child objects
+		DestroyObject(assetManager);
 		DestroyObject(renderer);
 		DestroyObject(window);
+		DestroyObject(jobManager);
 		DestroyObject(logger);
 	}
 }
