@@ -1,15 +1,14 @@
 #pragma once
 
-#include "Platform/Window.hpp"
-
 #include <Core.hpp>
+#include "Platform/Window.hpp"
 
 namespace wfe {
 	/// @brief An abstraction for the renderer's backend API.
 	class Renderer {
 	public:
-		/// @brief A struct that represents an exception caused by an unsupported renderer backend API.
-		struct UnsupportedAPIException : public Exception {
+		/// @brief A class that represents an exception caused by an unsupported renderer backend API.
+		class UnsupportedAPIException : public Exception {
 		public:
 			UnsupportedAPIException() = delete;
 			/// @brief Copies the given exception.
@@ -69,13 +68,19 @@ namespace wfe {
 
 		/// @brief Gets the renderer backend's API.
 		/// @return The enum value representing the renderer backend's API.
-		RendererBackendAPI GetRendererBackendAPI() const;
+		RendererBackendAPI GetRendererBackendAPI() const {
+			return rendererBackendAPI;
+		}
 		/// @brief Gets the renderer's backend inplementation.
 		/// @return A void pointer that can be cast to a pointer to the appropriate renderer backend's class.
-		void* GetRendererBackend();
+		void* GetRendererBackend() {
+			return rendererBackend;
+		}
 		/// @brief Gets the renderer's backend inplementation.
 		/// @return A const void pointer that can be cast to a const pointer to the appropriate renderer backend's class.
-		const void* GetRendererBackend() const;
+		const void* GetRendererBackend() const {
+			return rendererBackend;
+		}
 
 		/// @brief Destroys the renderer.
 		~Renderer();

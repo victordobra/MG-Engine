@@ -2,7 +2,7 @@
 
 namespace wfe {
 	// Static variables
-	vector<Asset::AssetType> Asset::assetTypes{};
+	constinit vector<Asset::AssetType> Asset::assetTypes{};
 
 	// Job functions
 	void* AssetManager::LoadAssetJob(void* args) {

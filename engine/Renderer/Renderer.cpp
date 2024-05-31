@@ -2,7 +2,6 @@
 #include "Vulkan/VulkanRenderer.hpp"
 
 namespace wfe {
-	/// @brief Creates a renderer using the most optimal available API.
 	Renderer::Renderer(Window* window, bool8_t debugEnabled, Logger* logger) {
 		// Try to create the Vulkan renderer
 		try {
@@ -17,17 +16,6 @@ namespace wfe {
 		throw UnsupportedAPIException("Failed to find an implemented renderer API supported by the current machine!");
 	}
 
-	Renderer::RendererBackendAPI Renderer::GetRendererBackendAPI() const {
-		return rendererBackendAPI;
-	}
-	void* Renderer::GetRendererBackend() {
-		return rendererBackend;
-	}
-	const void* Renderer::GetRendererBackend() const {
-		return rendererBackend;
-	}
-
-	/// @brief Destroys the renderer.
 	Renderer::~Renderer() {
 		// Destroy the renderer backend based on its API
 		switch(rendererBackendAPI) {
