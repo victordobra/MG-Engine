@@ -30,29 +30,6 @@ namespace wfe {
 		GPUBuffer& operator=(const GPUBuffer&) = delete;
 		GPUBuffer& operator=(GPUBuffer&&) noexcept = delete;
 
-		/// @brief Maps the buffer's memory to RAM.
-		void MapMemory() {
-			// Call the map function for the renderer's API
-			switch(api) {
-			case Renderer::RENDERER_BACKEND_API_VULKAN:
-				((VulkanBuffer*)internalData)->MapMemory();
-				break;
-			default:
-				throw Exception("Invalid renderer API!");
-			}
-		}
-		/// @brief Unmaps the buffer's memory from RAM.
-		void UnmapMemory() {
-			// Call the unmap function for the renderer's API
-			switch(api) {
-			case Renderer::RENDERER_BACKEND_API_VULKAN:
-				((VulkanBuffer*)internalData)->UnmapMemory();
-				break;
-			default:
-				throw Exception("Invalid renderer API!");
-			}
-		}
-
 		/// @brief Gets the buffer's size.
 		/// @return The buffer's size.
 		uint64_t GetSize() const {

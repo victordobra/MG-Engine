@@ -14,9 +14,9 @@ namespace wfe {
 			indicesArr[indicesCount++] = indices.graphicsIndex;
 		if(indices.presentIndex != UINT32_T_MAX && indices.presentIndex != indices.graphicsIndex)
 			indicesArr[indicesCount++] = indices.presentIndex;
-		if(indices.transferIndex != indices.graphicsIndex && indices.transferIndex != indices.presentIndex)
+		if(indices.transferIndex != UINT32_T_MAX && indices.transferIndex != indices.graphicsIndex && indices.transferIndex != indices.presentIndex)
 			indicesArr[indicesCount++] = indices.transferIndex;
-		if(indices.computeIndex != indices.graphicsIndex && indices.computeIndex != indices.presentIndex && indices.computeIndex != indices.transferIndex)
+		if(indices.computeIndex != UINT32_T_MAX && indices.computeIndex != indices.graphicsIndex && indices.computeIndex != indices.presentIndex && indices.computeIndex != indices.transferIndex)
 			indicesArr[indicesCount++] = indices.computeIndex;
 
 		// Set the buffer create info
@@ -58,13 +58,6 @@ namespace wfe {
 	VulkanBuffer::VulkanBuffer(VulkanRenderer* renderer, VkDeviceSize size, VulkanAllocator::MemoryType memoryType) : renderer(renderer), size(size) {
 		// Create the buffer
 		CreateBuffer(memoryType);
-	}
-
-	void VulkanBuffer::MapMemory() {
-		// TODO: Implement memory mapping in allocator
-	}
-	void VulkanBuffer::UnmapMemory() {
-		// TODO: Implement memory mapping in allocator
 	}
 
 	VulkanBuffer::~VulkanBuffer() {

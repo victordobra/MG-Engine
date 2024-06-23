@@ -25,11 +25,6 @@ namespace wfe {
 		VulkanBuffer(const VulkanBuffer&) = delete;
 		VulkanBuffer(VulkanBuffer&&) noexcept = delete;
 
-		/// @brief Maps the buffer's memory to RAM.
-		void MapMemory();
-		/// @brief Unmaps the buffer's memory from RAM.
-		void UnmapMemory();
-
 		/// @brief Gets the internal Vulkan buffer's handle.
 		/// @return The internal Vulkan buffer's handle.
 		VkBuffer GetBuffer() {
@@ -48,12 +43,12 @@ namespace wfe {
 		/// @brief Gets the buffer's mapped memory.
 		/// @return A pointer to the buffer's mapped memory, or nullptr if the buffer isn't mapped.
 		void* GetMappedMemory() {
-			return mappedMemory;
+			return renderer->GetAllocator()->GetMappedMemory(bufferMemory);
 		}
 		/// @brief Gets the buffer's mapped memory.
 		/// @return A const pointer to the buffer's mapped memory, or nullptr if the buffer isn't mapped.
 		const void* GetMappedMemory() const {
-			return mappedMemory;
+			return renderer->GetAllocator()->GetMappedMemory(bufferMemory);
 		}
 
 		/// @brief Destroys the Vulkan GPU memory buffer.
@@ -65,6 +60,5 @@ namespace wfe {
 		VkBuffer buffer;
 		VulkanAllocator::MemoryBlock bufferMemory;
 		VkDeviceSize size;
-		void* mappedMemory;
 	};
 }
