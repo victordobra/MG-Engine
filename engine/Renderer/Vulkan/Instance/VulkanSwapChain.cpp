@@ -422,12 +422,12 @@ namespace wfe {
 		// Set the present mode to FIFO, or mailpox, if supported
 		settings.presentMode = VK_PRESENT_MODE_FIFO_KHR;
 
-		/*for(uint32_t i = 0; i != presentModeCount; ++i) {
+		for(uint32_t i = 0; i != presentModeCount; ++i) {
 			if(presentModes[i] == VK_PRESENT_MODE_MAILBOX_KHR) {
 				settings.presentMode = VK_PRESENT_MODE_MAILBOX_KHR;
 				break;
 			}
-		}*/
+		}
 
 		// Set the other settings
 		settings.compositeAlpha = COMPOSITE_ALPHA;
