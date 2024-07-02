@@ -64,7 +64,7 @@ namespace wfe {
 			}
 		}
 
-		/// @brief Gets the internal buffer implementation data, which can be used cased on the renderer's API.
+		/// @brief Gets the internal buffer implementation data, which can be used based on the renderer's API.
 		/// @return A void pointer to the internal implementation's class.
 		void* GetInternalData() {
 			return internalData;

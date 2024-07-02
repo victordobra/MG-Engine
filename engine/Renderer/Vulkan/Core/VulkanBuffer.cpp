@@ -40,6 +40,11 @@ namespace wfe {
 		result = renderer->GetAllocator()->AllocBufferMemory(buffer, memoryType, bufferMemory);
 		if(result != VK_SUCCESS)
 			throw Exception("Failed to allocate Vulkan buffer memory! Error code: %s", string_VkResult(result));
+		
+		// Bind the buffer to its memory
+		result = renderer->GetAllocator()->BindBufferMemories(1, &buffer, &bufferMemory);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to bind Vulkan buffer memory! Error code: %s", string_VkResult(result));
 	}
 
 	// Public functions
