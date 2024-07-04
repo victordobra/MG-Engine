@@ -16,8 +16,6 @@ namespace wfe {
 	/// @brief A renderer that uses the Vulkan API.
 	class VulkanRenderer {
 	public:
-	 	/// @brief The maximum number of frames in flight at any moment.
-	 	static const size_t MAX_FRAMES_IN_FLIGHT = 2;
 		/// @brief The allocation callbacks used by all Vulkan functions.
 		static const VkAllocationCallbacks VULKAN_ALLOC_CALLBACKS;
 

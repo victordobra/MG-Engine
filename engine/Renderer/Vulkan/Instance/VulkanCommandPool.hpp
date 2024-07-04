@@ -39,19 +39,34 @@ namespace wfe {
 		/// @brief Gets the Vulkan command pools of the implementation.
 		/// @return A pointer to an array of handles to the Vulkan command pools.
 		VkCommandPool* GetCommandPools() {
-			return commandPools;
+			// Get the current thread's command pools, create them if they don't exist
+			Thread::ThreadID threadID = GetCurrentThreadID();
+			if(!commandPools.count(threadID))
+				CreateCommandPools(threadID);
+			return commandPools[threadID].commandPools;
 		}
 		/// @brief Gets the Vulkan command pool of the implementation at the get index.
 		/// @param index The index of the Vulkan command pool.
 		/// @return A handle to the Vulkan command pool at the given index.
 		VkCommandPool GetCommandPool(size_t index) {
-			return commandPools[index];
+			// Get the current thread's command pools, create them if they don't exist
+			Thread::ThreadID threadID = GetCurrentThreadID();
+			if(!commandPools.count(threadID))
+				CreateCommandPools(threadID);
+			return commandPools[threadID].commandPools[index];
 		}
 
 		/// @brief Destroys the command pool.
 		~VulkanCommandPool();
 	private:
+		struct ThreadCommandPools {
+			VkCommandPool commandPools[Renderer::MAX_FRAMES_IN_FLIGHT];
+		};
+
+		void CreateCommandPools(Thread::ThreadID threadID);
+
 		VulkanDevice* device;
-		VkCommandPool commandPools[Renderer::MAX_FRAMES_IN_FLIGHT];
+		VkCommandPoolCreateInfo createInfo;
+		std::unordered_map<Thread::ThreadID, ThreadCommandPools> commandPools;
 	};
 }
