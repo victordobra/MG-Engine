@@ -96,7 +96,6 @@ namespace wfe {
 			DestroyObject(swapChain);
 		DestroyObject(allocator);
 		DestroyObject(graphicsCommandPool);
-		DestroyObject(presentCommandPool);
 		DestroyObject(transferCommandPool);
 		DestroyObject(computeCommandPool);
 		DestroyObject(device);
