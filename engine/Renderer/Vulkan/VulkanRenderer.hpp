@@ -103,16 +103,6 @@ namespace wfe {
 		const VulkanCommandPool* GetGraphicsCommandPool() const {
 			return graphicsCommandPool;
 		}
-		/// @brief Gets the Vulkan renderer's present command pool.
-		/// @return A pointer to the Vulkan renderer's present command pool.
-		VulkanCommandPool* GetPresentCommandPool() {
-			return presentCommandPool;
-		}
-		/// @brief Gets the Vulkan renderer's present command pool.
-		/// @return A const pointer to the Vulkan renderer's present command pool.
-		const VulkanCommandPool* GetPresentCommandPool() const {
-			return presentCommandPool;
-		}
 		/// @brief Gets the Vulkan renderer's transfer command pool.
 		/// @return A pointer to the Vulkan renderer's transfer command pool.
 		VulkanCommandPool* GetTransferCommandPool() {
@@ -165,7 +155,6 @@ namespace wfe {
 		VulkanSurface* surface;
 		VulkanDevice* device;
 		VulkanCommandPool* graphicsCommandPool;
-		VulkanCommandPool* presentCommandPool;
 		VulkanCommandPool* transferCommandPool;
 		VulkanCommandPool* computeCommandPool;
 		VulkanAllocator* allocator;

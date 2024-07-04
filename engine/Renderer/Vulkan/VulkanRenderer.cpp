@@ -73,7 +73,6 @@ namespace wfe {
 
 		// Create all command pools
 		graphicsCommandPool = NewObject<VulkanCommandPool>(device, device->GetQueueFamilyIndices().graphicsIndex, 0);
-		presentCommandPool = NewObject<VulkanCommandPool>(device, device->GetQueueFamilyIndices().presentIndex, 0);
 		transferCommandPool = NewObject<VulkanCommandPool>(device, device->GetQueueFamilyIndices().transferIndex, 0);
 		computeCommandPool = NewObject<VulkanCommandPool>(device, device->GetQueueFamilyIndices().computeIndex, 0);
 
