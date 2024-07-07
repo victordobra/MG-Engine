@@ -36,37 +36,23 @@ namespace wfe {
 		const VulkanDevice* GetDevice() const {
 			return device;
 		}
-		/// @brief Gets the Vulkan command pools of the implementation.
-		/// @return A pointer to an array of handles to the Vulkan command pools.
-		VkCommandPool* GetCommandPools() {
-			// Get the current thread's command pools, create them if they don't exist
-			Thread::ThreadID threadID = GetCurrentThreadID();
-			if(!commandPools.count(threadID))
-				CreateCommandPools(threadID);
-			return commandPools[threadID].commandPools;
-		}
-		/// @brief Gets the Vulkan command pool of the implementation at the get index.
-		/// @param index The index of the Vulkan command pool.
-		/// @return A handle to the Vulkan command pool at the given index.
+		/// @brief Gets the Vulkan command pool of the implementation for the current thread.
+		/// @return A handle to the Vulkan command pool.
 		VkCommandPool GetCommandPool(size_t index) {
 			// Get the current thread's command pools, create them if they don't exist
 			Thread::ThreadID threadID = GetCurrentThreadID();
 			if(!commandPools.count(threadID))
-				CreateCommandPools(threadID);
-			return commandPools[threadID].commandPools[index];
+				CreateCommandPool(threadID);
+			return commandPools[threadID];
 		}
 
 		/// @brief Destroys the command pool.
 		~VulkanCommandPool();
 	private:
-		struct ThreadCommandPools {
-			VkCommandPool commandPools[Renderer::MAX_FRAMES_IN_FLIGHT];
-		};
-
-		void CreateCommandPools(Thread::ThreadID threadID);
+		void CreateCommandPool(Thread::ThreadID threadID);
 
 		VulkanDevice* device;
 		VkCommandPoolCreateInfo createInfo;
-		std::unordered_map<Thread::ThreadID, ThreadCommandPools> commandPools;
+		std::unordered_map<Thread::ThreadID, VkCommandPool> commandPools;
 	};
 }

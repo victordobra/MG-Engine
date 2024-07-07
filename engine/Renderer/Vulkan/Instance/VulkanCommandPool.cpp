@@ -5,17 +5,15 @@
 
 namespace wfe {
 	// Internal helper functions
-	void VulkanCommandPool::CreateCommandPools(Thread::ThreadID threadID) {
-		// Create the command pools
-		ThreadCommandPools threadCommandPools;
-		for(size_t i = 0; i != Renderer::MAX_FRAMES_IN_FLIGHT; ++i) {
-			VkResult result = device->GetLoader()->vkCreateCommandPool(device->GetDevice(), &createInfo, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS, &threadCommandPools.commandPools[i]);
-			if(result != VK_SUCCESS)
-				throw Exception("Failed to create Vulkan command pool! Error code: %s", string_VkResult(result));
-		}
+	void VulkanCommandPool::CreateCommandPool(Thread::ThreadID threadID) {
+		// Create the command pool
+		VkCommandPool commandPool;
+		VkResult result = device->GetLoader()->vkCreateCommandPool(device->GetDevice(), &createInfo, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS, &commandPool);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to create Vulkan command pool! Error code: %s", string_VkResult(result));
 		
-		// Add the command pools to the map
-		commandPools.insert({ threadID, threadCommandPools });
+		// Add the command pool to the map
+		commandPools.insert({ threadID, commandPool });
 	}
 
 	// Public functions
@@ -29,9 +27,7 @@ namespace wfe {
 
 	VulkanCommandPool::~VulkanCommandPool() {
 		// Destroy the command pools
-		for(auto threadCommandPools : commandPools) {
-			for(size_t i = 0; i != Renderer::MAX_FRAMES_IN_FLIGHT; ++i)
-				device->GetLoader()->vkDestroyCommandPool(device->GetDevice(), threadCommandPools.second.commandPools[i], &VulkanRenderer::VULKAN_ALLOC_CALLBACKS);
-		}
+		for(auto commandPool : commandPools)
+			device->GetLoader()->vkDestroyCommandPool(device->GetDevice(), commandPool.second, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS);
 	}
 }
