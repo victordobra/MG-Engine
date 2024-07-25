@@ -43,7 +43,7 @@ namespace wfe {
 			}
 		}
 	private:
-		Renderer::RendererBackendAPI api;
 		char internalData[sizeof(VulkanSemaphore)];
+		Renderer::RendererBackendAPI api;
 	};
 }

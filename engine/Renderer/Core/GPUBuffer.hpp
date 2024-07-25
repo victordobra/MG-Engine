@@ -80,7 +80,7 @@ namespace wfe {
 			}
 		}
 	private:
-		Renderer::RendererBackendAPI api;
 		char internalData[sizeof(VulkanBuffer)];
+		Renderer::RendererBackendAPI api;
 	};
 }

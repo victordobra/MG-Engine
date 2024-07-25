@@ -72,6 +72,11 @@ namespace wfe {
 		VkExtent3D GetImageExtent() const {
 			return imageExtent;
 		}
+		/// @brief Gets the subresource range which includes the whole image.
+		/// @return The subresource range which includes the whole image.
+		VkImageSubresourceRange GetImageSubresourceRange() const {
+			return subresourceRange;
+		}
 		/// @brief Gets the image's width.
 		/// @return The image's width.
 		uint32_t GetWidth() const {
@@ -107,7 +112,7 @@ namespace wfe {
 		VkImage image;
 		VkImageView imageView;
 		VulkanAllocator::MemoryBlock imageMemory;
-		VkImageLayout imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		VkExtent3D imageExtent;
+		VkImageSubresourceRange subresourceRange;
     };
 }

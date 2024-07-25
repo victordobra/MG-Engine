@@ -8,6 +8,9 @@
 #include <vulkan/vulkan_core.h>
 
 namespace wfe {
+	struct GPUCommandBufferSubmitInfo;
+	class GPUFence;
+
 	/// @brief A wrapper for a Vulkan logical device.
 	class VulkanDevice {
 	public:
@@ -151,6 +154,12 @@ namespace wfe {
 		const VkPhysicalDeviceFeatures& GetDeviceFeatures() const {
 			return features;
 		}
+
+		/// @brief Runs the given command buffers.
+		/// @param submitCount The number of command buffer submits to run.
+		/// @param submits A pointer to the array of command buffer submits.
+		/// @param fence A pointer to the fence to signal once all command buffers finish execution, or nullptr if no fence will be signaled.
+		void RunCommandBuffers(size_t submitCount, const GPUCommandBufferSubmitInfo* submits, GPUFence* fence);
 
 		/// @brief Destroys the Vulkan logical device.
 		~VulkanDevice();

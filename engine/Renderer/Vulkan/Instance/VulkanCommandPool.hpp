@@ -38,7 +38,7 @@ namespace wfe {
 		}
 		/// @brief Gets the Vulkan command pool of the implementation for the current thread.
 		/// @return A handle to the Vulkan command pool.
-		VkCommandPool GetCommandPool(size_t index) {
+		VkCommandPool GetCommandPool() {
 			// Get the current thread's command pools, create them if they don't exist
 			Thread::ThreadID threadID = GetCurrentThreadID();
 			if(!commandPools.count(threadID))

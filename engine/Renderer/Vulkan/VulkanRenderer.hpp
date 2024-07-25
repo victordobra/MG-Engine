@@ -13,6 +13,9 @@
 #include <vulkan/vulkan_core.h>
 
 namespace wfe {
+	struct GPUCommandBufferSubmitInfo;
+	class GPUFence;
+
 	/// @brief A renderer that uses the Vulkan API.
 	class VulkanRenderer {
 	public:
@@ -140,6 +143,15 @@ namespace wfe {
 		/// @return A const pointer to the Vulkan renderer's swap chain.
 		const VulkanSwapChain* GetSwapChain() const {
 			return swapChain;
+		}
+
+		/// @brief Runs the given command buffers.
+		/// @param submitCount The number of command buffer submits to run.
+		/// @param submits A pointer to the array of command buffer submits.
+		/// @param fence A pointer to the fence to signal once all command buffers finish execution, or nullptr if no fence will be signaled.
+		void RunCommandBuffers(size_t submitCount, const GPUCommandBufferSubmitInfo* submits, GPUFence* fence) {
+			// Call the device's run command buffers function
+			device->RunCommandBuffers(submitCount, submits, fence);
 		}
 
 		/// @brief Destroys the Vulkan renderer.

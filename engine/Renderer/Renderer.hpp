@@ -4,6 +4,9 @@
 #include "Platform/Window.hpp"
 
 namespace wfe {
+	struct GPUCommandBufferSubmitInfo;
+	class GPUFence;
+
 	/// @brief An abstraction for the renderer's backend API.
 	class Renderer {
 	public:
@@ -81,6 +84,12 @@ namespace wfe {
 		const void* GetRendererBackend() const {
 			return rendererBackend;
 		}
+
+		/// @brief Runs the given command buffers.
+		/// @param submitCount The number of command buffer submits to run.
+		/// @param submits A pointer to the array of command buffer submits.
+		/// @param fence A pointer to the fence to signal once all command buffers finish execution, or nullptr if no fence will be signaled.
+		void RunCommandBuffers(size_t submitCount, const GPUCommandBufferSubmitInfo* submits, GPUFence* fence);
 
 		/// @brief Destroys the renderer.
 		~Renderer();

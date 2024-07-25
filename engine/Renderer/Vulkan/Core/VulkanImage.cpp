@@ -64,6 +64,15 @@ namespace wfe {
 		} else {
 			aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		}
+
+		// Set the image's subresource range
+		subresourceRange = {
+			.aspectMask = aspectMask,
+			.baseMipLevel = 0,
+			.levelCount = mipLevels,
+			.baseArrayLayer = 0,
+			.layerCount = arrayLayers
+		};
 		
 		// Set the image view create info
 		VkImageViewCreateInfo imageViewInfo {
@@ -79,8 +88,55 @@ namespace wfe {
 				.b = VK_COMPONENT_SWIZZLE_IDENTITY,
 				.a = VK_COMPONENT_SWIZZLE_IDENTITY
 			},
+			.subresourceRange = subresourceRange
+		};
+
+		// Create the image view
+		result = renderer->GetLoader()->vkCreateImageView(renderer->GetDevice()->GetDevice(), &imageViewInfo, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS, &imageView);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to create Vulkan image view! Error code: %s", string_VkResult(result));
+
+		// Set the command buffer alloc info
+		VkCommandBufferAllocateInfo allocInfo {
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+			.pNext = nullptr,
+			.commandPool = renderer->GetTransferCommandPool()->GetCommandPool(),
+			.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+			.commandBufferCount = 1
+		};
+
+		// Allocate the command buffer
+		VkCommandBuffer commandBuffer;
+		result = renderer->GetLoader()->vkAllocateCommandBuffers(renderer->GetDevice()->GetDevice(), &allocInfo, &commandBuffer);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to allocate Vulkan command buffer! Error code: %s", string_VkResult(result));
+		
+		// Set the command buffer begin info
+		VkCommandBufferBeginInfo beginInfo {
+			.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
+			.pNext = nullptr,
+			.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+			.pInheritanceInfo = nullptr
+		};
+
+		// Begin recording the command buffer
+		result = renderer->GetLoader()->vkBeginCommandBuffer(commandBuffer, &beginInfo);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to begin recording Vulkan command buffer! Error code: %s", string_VkResult(result));
+		
+		// Set the image memory barrier info
+		VkImageMemoryBarrier memoryBarrier {
+			.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+			.pNext = nullptr,
+			.srcAccessMask = 0,
+			.dstAccessMask = 0,
+			.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+			.newLayout = VK_IMAGE_LAYOUT_GENERAL,
+			.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+			.image = image,
 			.subresourceRange = {
-				.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+				.aspectMask = aspectMask,
 				.baseMipLevel = 0,
 				.levelCount = mipLevels,
 				.baseArrayLayer = 0,
@@ -88,10 +144,53 @@ namespace wfe {
 			}
 		};
 
-		// Create the image view
-		result = renderer->GetLoader()->vkCreateImageView(renderer->GetDevice()->GetDevice(), &imageViewInfo, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS, &imageView);
+		// Record the image layout transition to the command buffer
+		renderer->GetLoader()->vkCmdPipelineBarrier(commandBuffer, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &memoryBarrier);
+
+		// End recording the command buffer
+		result = renderer->GetLoader()->vkEndCommandBuffer(commandBuffer);
 		if(result != VK_SUCCESS)
-			throw Exception("Failed to create Vulkan image view! Error code: %s", string_VkResult(result));
+			throw Exception("Failed to end recording Vulkan command buffer! Error code: %s", string_VkResult(result));
+		
+		// Set the fence create info
+		VkFenceCreateInfo fenceInfo {
+			.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO,
+			.pNext = nullptr,
+			.flags = 0
+		};
+
+		// Create the fence
+		VkFence fence;
+		result = renderer->GetLoader()->vkCreateFence(renderer->GetDevice()->GetDevice(), &fenceInfo, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS, &fence);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to create Vulkan fence! Error code: %s", string_VkResult(result));
+		
+		// Set the command buffer submit info
+		VkSubmitInfo submitInfo {
+			.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+			.pNext = nullptr,
+			.waitSemaphoreCount = 0,
+			.pWaitSemaphores = nullptr,
+			.pWaitDstStageMask = nullptr,
+			.commandBufferCount = 1,
+			.pCommandBuffers = &commandBuffer,
+			.signalSemaphoreCount = 0,
+			.pSignalSemaphores = nullptr
+		};
+
+		// Submit the command buffer
+		result = renderer->GetLoader()->vkQueueSubmit(renderer->GetDevice()->GetTransferQueue(), 1, &submitInfo, fence);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to submit Vulkan command buffer! Error code: %s", string_VkResult(result));
+		
+		// Wait for the command buffer to finish execution
+		result = renderer->GetLoader()->vkWaitForFences(renderer->GetDevice()->GetDevice(), 1, &fence, VK_TRUE, UINT64_T_MAX);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to wait for Vulkan fence! Error code: %s", string_VkResult(result));
+		
+		// Destroy the fence and free the command buffer
+		renderer->GetLoader()->vkDestroyFence(renderer->GetDevice()->GetDevice(), fence, &VulkanRenderer::VULKAN_ALLOC_CALLBACKS);
+		renderer->GetLoader()->vkFreeCommandBuffers(renderer->GetDevice()->GetDevice(), renderer->GetTransferCommandPool()->GetCommandPool(), 1, &commandBuffer);
 	}
 
 	// Public functions

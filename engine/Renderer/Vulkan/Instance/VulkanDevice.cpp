@@ -1,6 +1,7 @@
 #include "VulkanDevice.hpp"
 #include "Renderer/Vulkan/VulkanRenderer.hpp"
 #include "Renderer/Renderer.hpp"
+#include "Renderer/Core/GPUCommandBuffer.hpp"
 
 #if defined(WFE_PLATFORM_WINDOWS)
 #include <vulkan/vulkan_win32.h>
@@ -432,6 +433,97 @@ namespace wfe {
 
 		// Create the logical device and get its queues
 		CreateDevice(nullptr, false);
+	}
+
+	void VulkanDevice::RunCommandBuffers(size_t submitCount, const GPUCommandBufferSubmitInfo* submits, GPUFence* fence) {
+		// Get the most demanding command buffer type
+		GPUCommandBufferType commandType = GPU_COMMAND_BUFFER_TYPE_TRANSFER;
+		for(size_t i = 0; i != submitCount; ++i) {
+			for(auto* commandBuffer : submits[i].commandBuffers) {
+				if(commandBuffer->GetType() < commandType)
+					commandType = commandBuffer->GetType();
+			}
+		}
+
+		// Get the queue to submit the command buffers to
+		VkQueue submitQueue;
+		switch(commandType) {
+		case GPU_COMMAND_BUFFER_TYPE_GRAPHICS:
+			submitQueue = graphicsQueue;
+			break;
+		case GPU_COMMAND_BUFFER_TYPE_COMPUTE:
+			submitQueue = computeQueue;
+			break;
+		case GPU_COMMAND_BUFFER_TYPE_TRANSFER:
+			submitQueue = transferQueue;
+			break;
+		}
+
+		// Count the number of wait semaphores, signal semaphores and command buffers in the submits
+		size_t waitSemaphoreCount = 0, signalSemaphoreCount = 0, commandBufferCount = 0;
+		for(size_t i = 0; i != submitCount; ++i) {
+			waitSemaphoreCount = submits[i].waitSemaphores.size();
+			signalSemaphoreCount = submits[i].signalSemaphores.size();
+			commandBufferCount = submits[i].commandBuffers.size();
+		}
+
+		// Allocate all required arrays
+		PushMemoryUsageType(MEMORY_USAGE_TYPE_COMMAND);
+		VkSubmitInfo* submitInfos = (VkSubmitInfo*)AllocMemory(sizeof(VkSubmitInfo) * submitCount + sizeof(VkSemaphore) * waitSemaphoreCount + sizeof(VkPipelineStageFlags) * waitSemaphoreCount + sizeof(VkSemaphore) * signalSemaphoreCount + sizeof(VkCommandBuffer) * commandBufferCount);
+		PopMemoryUsageType();
+		if(!submitInfos)
+			throw BadAllocException("Failed to allocate Vulkan command buffer submit info!");
+		
+		VkSemaphore* waitSemaphores = (VkSemaphore*)(submitInfos + submitCount);
+		VkPipelineStageFlags* waitDstStageMasks = (VkPipelineStageFlags*)(waitSemaphores + waitSemaphoreCount);
+		VkSemaphore* signalSemaphores = (VkSemaphore*)(waitDstStageMasks + waitSemaphoreCount);
+		VkCommandBuffer* commandBuffers = (VkCommandBuffer*)(signalSemaphores + signalSemaphoreCount);
+
+		// Set the submit infos
+		for(size_t i = 0; i != submitCount; ++i) {
+			// Set the current submit info
+			submitInfos[i].sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+			submitInfos[i].pNext = nullptr;
+			submitInfos[i].waitSemaphoreCount = (uint32_t)submits[i].waitSemaphores.size();
+			submitInfos[i].pWaitSemaphores = waitSemaphores;
+			submitInfos[i].pWaitDstStageMask = waitDstStageMasks;
+			submitInfos[i].commandBufferCount = (uint32_t)submits[i].commandBuffers.size();
+			submitInfos[i].pCommandBuffers = commandBuffers;
+			submitInfos[i].signalSemaphoreCount = (uint32_t)submits[i].signalSemaphores.size();
+			submitInfos[i].pSignalSemaphores = signalSemaphores;
+
+			// Set the current submit's wait semaphores and target stage masks
+			for(size_t j = 0; j != submits[i].waitSemaphores.size(); ++j)
+				waitSemaphores[j] = ((VulkanSemaphore*)submits[i].waitSemaphores[j]->GetInternalData())->GetSemaphore();
+			waitSemaphores += submits[i].waitSemaphores.size();
+
+			for(size_t j = 0; j != submits[i].waitStages.size(); ++j)
+				waitDstStageMasks[j] = VulkanCommandBuffer::PipelineStageToVkPipelineStageFlags(submits[i].waitStages[j]);
+			waitDstStageMasks += submits[i].waitStages.size();
+
+			// Set the current submit's signal semaphores
+			for(size_t j = 0; j != submits[i].signalSemaphores.size(); ++j)
+				signalSemaphores[j] = ((VulkanSemaphore*)submits[i].signalSemaphores[j]->GetInternalData())->GetSemaphore();
+			signalSemaphores += submits[i].signalSemaphores.size();
+
+			// Set the current submit's command buffers
+			for(size_t j = 0; j != submits[i].commandBuffers.size(); ++j)
+				commandBuffers[j] = ((VulkanCommandBuffer*)submits[i].commandBuffers[j]->GetInternalData())->GetCommandBuffer();
+			commandBuffers += submits[i].commandBuffers.size();
+		}
+
+		// Get the signal fence's handle
+		VkFence fenceHandle;
+		if(fence) {
+			fenceHandle = ((VulkanFence*)fence->GetInternalData())->GetFence();
+		} else {
+			fenceHandle = VK_NULL_HANDLE;
+		}
+
+		// Submit the command buffers
+		VkResult result = loader->vkQueueSubmit(submitQueue, (uint32_t)submitCount, submitInfos, fenceHandle);
+		if(result != VK_SUCCESS)
+			throw Exception("Failed to submit Vulkan command buffers for execution! Error code: %s", string_VkResult(result));
 	}
 
 	VulkanDevice::~VulkanDevice() {
